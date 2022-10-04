@@ -2,7 +2,11 @@
 
 from fileinput import filename
 from random import choice
+from re import L
 import sys
+
+#how long is the n-gram?
+n_gram = int(sys.argv[2])
 
 
 def open_and_read_file(file_path):
@@ -22,7 +26,7 @@ def open_and_read_file(file_path):
     return poem
 
 
-def make_chains(text_string, n_gram = 2):
+def make_chains(text_string, n_gram = n_gram):
     """Take input text as string; return dictionary of Markov chains.
 
     A chain will be a key that consists of a tuple of (word1, word2)
@@ -49,36 +53,45 @@ def make_chains(text_string, n_gram = 2):
 
     chains = {}
 
+    n_gram = int(n_gram)
     poem = text_string.split(' ')
 
-    count = 1
-    while count < len(poem) - 1:
-        # print(f"line 54 count: {count}")
-        tup = (poem[count - 1], poem[count])
+    count = n_gram
+    while count < len(poem):
+        subcount = n_gram
+        gram = []
+        while subcount > 0:
+            gram.append(poem[count - subcount])
+            subcount -= 1
+        tup = tuple(gram)
+        # tup = (poem[count - 2], poem[count - 1])
         value = chains.get(tup,[])
-        value.append(poem[count + 1])
+        value.append(poem[count])
         chains[tup] = value
         count += 1
 
     return chains
 
 
-def make_text(chains):
+def make_text(chains, n_gram = n_gram):
     """Return text from chains."""
 
-    words = []
-
     starting_point = choice(list(chains.keys()))  #get a tuple of words
-    words.extend([starting_point[0], starting_point[1]])
+    
+    words = list(starting_point)
 
     while True:
-        tup = (words[-2], words[-1])
+        tup = []
+        for i in range(0,n_gram):
+            tup.append(words[i - n_gram])
+        tup = tuple(tup)
         try:
             value = chains[tup]
             words.append(choice(value))
         except: break
 
     return ' '.join(words)
+
 
 
 # input_path = 'green-eggs.txt'
