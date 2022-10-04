@@ -1,6 +1,8 @@
 """Generate Markov text from text files."""
 
+from fileinput import filename
 from random import choice
+import sys
 
 
 def open_and_read_file(file_path):
@@ -10,12 +12,17 @@ def open_and_read_file(file_path):
     the file's contents as one string of text.
     """
 
-    # your code goes here
+    poem = ""
+    for line in open(file_path):
+        line = line.rstrip()
+        poem = poem + line + ' '
+    
+    poem.rstrip()
 
-    return 'Contents of your file as one long string'
+    return poem
 
 
-def make_chains(text_string):
+def make_chains(text_string, n_gram = 2):
     """Take input text as string; return dictionary of Markov chains.
 
     A chain will be a key that consists of a tuple of (word1, word2)
@@ -42,7 +49,16 @@ def make_chains(text_string):
 
     chains = {}
 
-    # your code goes here
+    poem = text_string.split(' ')
+
+    count = 1
+    while count < len(poem) - 1:
+        # print(f"line 54 count: {count}")
+        tup = (poem[count - 1], poem[count])
+        value = chains.get(tup,[])
+        value.append(poem[count + 1])
+        chains[tup] = value
+        count += 1
 
     return chains
 
@@ -52,12 +68,22 @@ def make_text(chains):
 
     words = []
 
-    # your code goes here
+    starting_point = choice(list(chains.keys()))  #get a tuple of words
+    words.extend([starting_point[0], starting_point[1]])
+
+    while True:
+        tup = (words[-2], words[-1])
+        try:
+            value = chains[tup]
+            words.append(choice(value))
+        except: break
 
     return ' '.join(words)
 
 
-input_path = 'green-eggs.txt'
+# input_path = 'green-eggs.txt'
+# input_path = 'gettysburg.txt'
+input_path = sys.argv[1]
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
