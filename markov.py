@@ -53,8 +53,7 @@ def make_chains(text_string, n_gram = n_gram):
 
     chains = {}
 
-    n_gram = int(n_gram)
-    poem = text_string.split(' ')
+    poem = text_string.split()  #w/o arg it accepts any amount of whitespace
 
     count = n_gram
     while count < len(poem):
@@ -64,7 +63,6 @@ def make_chains(text_string, n_gram = n_gram):
             gram.append(poem[count - subcount])
             subcount -= 1
         tup = tuple(gram)
-        # tup = (poem[count - 2], poem[count - 1])
         value = chains.get(tup,[])
         value.append(poem[count])
         chains[tup] = value
@@ -76,7 +74,12 @@ def make_chains(text_string, n_gram = n_gram):
 def make_text(chains, n_gram = n_gram):
     """Return text from chains."""
 
-    starting_point = choice(list(chains.keys()))  #get a tuple of words
+    cap_words = []
+    capitals = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    for key in chains.keys():
+        if key[0][0] in capitals:
+            cap_words.append(key)       #makes sure first word is capitalized
+    starting_point = choice(cap_words)  #get a tuple of words
     
     words = list(starting_point)
 
