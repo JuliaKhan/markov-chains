@@ -19,6 +19,12 @@ def open_and_read_file(file_path):
     poem = ""
     for line in open(file_path):
         line = line.rstrip()
+        if line == line.upper():
+            continue
+        if line.split()[0] == 'Chapter':
+            continue
+        if len(line.split()) < 2:
+            continue
         poem = poem + line + ' '
     
     poem.rstrip()
